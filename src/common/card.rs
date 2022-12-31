@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, self};
+use std::fmt::{self, Display, Formatter};
 
 /// An enum representing the rank of a card
 #[derive(Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Debug)]
@@ -46,7 +46,7 @@ impl Rank {
 
     /// Compares the two ranks, and determines if the rank is
     /// directly after this one
-    /// 
+    ///
     /// # Examples
     /// ```
     /// # use naipe::common::card::Rank;
@@ -97,5 +97,98 @@ impl Display for Rank {
             Rank::Queen => write!(f, "Q"),
             Rank::King => write!(f, "K"),
         }
+    }
+}
+
+/// An enum representing the suit of a card
+#[derive(Clone, Copy, Eq, PartialEq, Debug, PartialOrd, Ord)]
+pub enum Suit {
+    Spade,
+    Club,
+    Heart,
+    Diamond,
+}
+
+impl Suit {
+    /// Get all ranks in a vector
+    /// # Examples
+    /// ```
+    /// # use naipe::common::card::Suit;
+    /// let suits = Suit::all_suits();
+    /// assert_eq!(suits.len(), 4);
+    /// ```
+    pub fn all_suits() -> Vec<Suit> {
+        vec![Suit::Spade, Suit::Club, Suit::Heart, Suit::Diamond]
+    }
+}
+
+impl Display for Suit {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            Suit::Spade => write!(f, "♠"),
+            Suit::Club => write!(f, "♣"),
+            Suit::Heart => write!(f, "♥"),
+            Suit::Diamond => write!(f, "♦"),
+        }
+    }
+}
+
+/// A struct representing a card
+#[derive(Clone, Copy, Eq, PartialEq, Debug)]
+pub struct Card {
+    rank: Rank,
+    suit: Suit,
+}
+
+impl Card {
+    /// Creates a new card given the proper rank and suit
+    pub fn new(suit: Suit, rank: Rank) -> Card {
+        Card { rank, suit }
+    }
+
+    /// Compiles a list of all possible cards into a vector
+    /// # Examples
+    /// ```
+    /// # use naipe::common::card::Card;
+    /// let cards = Card::all_cards();
+    /// assert_eq!(cards.len(), 52);
+    /// ````
+    pub fn all_cards() -> Vec<Card> {
+        let suits = Suit::all_suits();
+
+        let ranks = Rank::all_ranks();
+
+        suits
+            .iter()
+            .flat_map(|suit| ranks.iter().map(|rank| Card::new(*suit, *rank)))
+            .collect()
+    }
+
+    /// Gets the rank of the given card
+    /// # Examples
+    /// ```
+    /// # use naipe::common::card::{Card, Rank, Suit};
+    /// let card = Card::new(Suit::Spade, Rank::Ace);
+    /// assert_eq!(card.get_rank(), Rank::Ace);
+    /// ```
+    pub fn get_rank(&self) -> Rank {
+        self.rank
+    }
+
+    /// Gets the suit of the given card
+    /// # Examples
+    /// ```
+    /// # use naipe::common::card::{Card, Rank, Suit};
+    /// let card = Card::new(Suit::Spade, Rank::Ace);
+    /// assert_eq!(card.get_suit(), Suit::Spade);
+    /// ```
+    pub fn get_suit(&self) -> Suit {
+        self.suit
+    }
+}
+
+impl Display for Card {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}{}", self.rank, self.suit)
     }
 }
