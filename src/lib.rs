@@ -9,3 +9,5 @@
 //! Common structs are in the [`crate::common`] module
 
 pub mod common;
+#[cfg(any(feature = "war"))]
+pub mod games;
