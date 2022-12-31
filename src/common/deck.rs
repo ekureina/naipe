@@ -60,6 +60,8 @@ impl Deck {
     }
 
     /// Deals a set amount of cards from the top of the deck for the specified number of hands
+    /// # Errors
+    /// [`DeckDealError::NotEnoughCards`] if the deck does not have enough cards to fulfill the deal request
     pub fn deal_cards(
         &mut self,
         hand_count: usize,
@@ -75,8 +77,8 @@ impl Deck {
         }
 
         for _ in 0..cards_per_hand {
-            for hand_num in 0..hand_count {
-                ret_hands[hand_num].push(self.cards.pop().ok_or(DeckDealError::NotEnoughCards)?);
+            for hand in &mut ret_hands {
+                hand.push(self.cards.pop().ok_or(DeckDealError::NotEnoughCards)?);
             }
         }
 

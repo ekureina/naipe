@@ -148,7 +148,7 @@ pub struct Card {
 impl Card {
     /// Creates a new card given the proper rank and suit
     pub fn new(suit: Suit, rank: Rank) -> Card {
-        Card { rank, suit }
+        Card { suit, rank }
     }
 
     /// Compiles a list of all possible cards into a vector
