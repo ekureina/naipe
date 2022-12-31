@@ -2,12 +2,12 @@
 //!
 //! Decks can have any integer number of full sets of cards
 
-use std::num::NonZeroU16;
+use std::{iter::zip, num::NonZeroU16};
 
 use rand::prelude::SliceRandom;
 use thiserror::Error;
 
-use super::card::Card;
+use super::{card::Card, hand::Hand};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Deck {
@@ -83,6 +83,43 @@ impl Deck {
         }
 
         Ok(ret_hands)
+    }
+
+    /// Deals a set amount of cards from the top of the deck directly into the given hands
+    /// # Errors
+    /// [`DeckDealError::NotEnoughCards`] if the deck does not have enough cards to fulfill the deal request
+    pub fn deal_cards_to_hands(
+        &mut self,
+        hands: &mut Vec<Hand>,
+        cards_per_hand: usize,
+    ) -> Result<(), DeckDealError> {
+        let card_vectors = self.deal_cards(hands.len(), cards_per_hand)?;
+        for (hand, cards) in zip(hands, card_vectors) {
+            hand.extend(cards);
+        }
+        Ok(())
+    }
+
+    /// Deals an equal amount of cards to a given number of hands, using as many cards as possible
+    /// # Errors
+    /// [`DeckDealError::NotEnoughCards`] if the deck does not have at least one card for each hand
+    pub fn deal_all_cards(&mut self, hand_count: usize) -> Result<Vec<Vec<Card>>, DeckDealError> {
+        if self.len() < hand_count {
+            return Err(DeckDealError::NotEnoughCards);
+        }
+
+        self.deal_cards(hand_count, self.len() / hand_count)
+    }
+
+    /// Deals an equal amount of cards to the given hands, using as many cards as possible
+    /// # Errors
+    /// [`DeckDealError::NotEnoughCards`] if the deck does not have at least one card for each hand
+    pub fn deal_all_cards_to_hands(&mut self, hands: &mut Vec<Hand>) -> Result<(), DeckDealError> {
+        let card_vectors = self.deal_all_cards(hands.len())?;
+        for (hand, cards) in zip(hands, card_vectors) {
+            hand.extend(cards);
+        }
+        Ok(())
     }
 }
 

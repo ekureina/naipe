@@ -43,6 +43,12 @@ impl<'a> IntoIterator for &'a Hand {
     }
 }
 
+impl Extend<Card> for Hand {
+    fn extend<T: IntoIterator<Item = Card>>(&mut self, iter: T) {
+        self.cards.extend(iter);
+    }
+}
+
 impl Display for Hand {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let string = self
