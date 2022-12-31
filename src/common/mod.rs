@@ -3,3 +3,4 @@
 //! Includes hands, decks, and cards, and utilities around each
 
 pub mod card;
+pub mod deck;
