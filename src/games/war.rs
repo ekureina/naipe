@@ -7,6 +7,8 @@ use crate::common::{deck::Deck, hand::Hand};
 pub struct WarGame {
     player_1_hand: Hand,
     player_2_hand: Hand,
+    player_1_capture: Deck,
+    player_2_capture: Deck,
 }
 
 impl Default for WarGame {
@@ -17,6 +19,8 @@ impl Default for WarGame {
         WarGame {
             player_1_hand: players[0].clone(),
             player_2_hand: players[1].clone(),
+            player_1_capture: Deck::new_empty(),
+            player_2_capture: Deck::new_empty(),
         }
     }
 }

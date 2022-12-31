@@ -14,6 +14,16 @@ impl Hand {
     pub fn new() -> Hand {
         Hand::default()
     }
+
+    /// Pops off the top card from the hand
+    pub fn pop(&mut self) -> Option<Card> {
+        self.cards.pop()
+    }
+
+    /// Finds if the hand is empty
+    pub fn is_empty(&self) -> bool {
+        self.cards.is_empty()
+    }
 }
 
 impl FromIterator<Card> for Hand {

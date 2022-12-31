@@ -28,6 +28,11 @@ impl Deck {
         Deck { cards }
     }
 
+    /// Creates a new deck with no cards in it
+    pub fn new_empty() -> Deck {
+        Deck { cards: vec![] }
+    }
+
     /// Shuffles the deck with the provided Rng
     /// Useful for seeded Rng
     pub fn shuffle<Rng: rand::Rng + ?Sized>(&mut self, rng: &mut Rng) {
