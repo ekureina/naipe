@@ -5,6 +5,7 @@
 use std::num::NonZeroU16;
 
 use rand::prelude::SliceRandom;
+use thiserror::Error;
 
 use super::card::Card;
 
@@ -59,10 +60,13 @@ impl Deck {
     }
 
     /// Deals a set amount of cards from the top of the deck for the specified number of hands
-    pub fn deal_cards(&mut self, hand_count: usize, cards_per_hand: usize) -> Vec<Vec<Card>> {
+    pub fn deal_cards(
+        &mut self,
+        hand_count: usize,
+        cards_per_hand: usize,
+    ) -> Result<Vec<Vec<Card>>, DeckDealError> {
         if self.len() < hand_count * cards_per_hand {
-            // TODO: Errors
-            panic!("Not enough cards to deal!");
+            return Err(DeckDealError::NotEnoughCards);
         }
 
         let mut ret_hands = Vec::with_capacity(hand_count);
@@ -72,11 +76,11 @@ impl Deck {
 
         for _ in 0..cards_per_hand {
             for hand_num in 0..hand_count {
-                ret_hands[hand_num].push(self.cards.pop().unwrap());
+                ret_hands[hand_num].push(self.cards.pop().ok_or(DeckDealError::NotEnoughCards)?);
             }
         }
 
-        ret_hands
+        Ok(ret_hands)
     }
 }
 
@@ -98,4 +102,11 @@ impl Extend<Card> for Deck {
     fn extend<T: IntoIterator<Item = Card>>(&mut self, iter: T) {
         self.cards.extend(iter);
     }
+}
+
+/// Errors related to dealing from a deck
+#[derive(Copy, Clone, Debug, Error)]
+pub enum DeckDealError {
+    #[error("Not enough cards in deck to deal")]
+    NotEnoughCards,
 }
