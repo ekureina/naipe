@@ -47,6 +47,37 @@ impl Deck {
     pub fn len(&self) -> usize {
         self.cards.len()
     }
+
+    /// Empties the deck fully
+    pub fn empty(&mut self) {
+        self.cards = vec![];
+    }
+
+    /// Finds if the deck is currently empty of cards
+    pub fn is_empty(&self) -> bool {
+        self.cards.is_empty()
+    }
+
+    /// Deals a set amount of cards from the top of the deck for the specified number of hands
+    pub fn deal_cards(&mut self, hand_count: usize, cards_per_hand: usize) -> Vec<Vec<Card>> {
+        if self.len() < hand_count * cards_per_hand {
+            // TODO: Errors
+            panic!("Not enough cards to deal!");
+        }
+
+        let mut ret_hands = Vec::with_capacity(hand_count);
+        for _ in 0..hand_count {
+            ret_hands.push(Vec::with_capacity(cards_per_hand));
+        }
+
+        for _ in 0..cards_per_hand {
+            for hand_num in 0..hand_count {
+                ret_hands[hand_num].push(self.cards.pop().unwrap());
+            }
+        }
+
+        ret_hands
+    }
 }
 
 impl Default for Deck {
