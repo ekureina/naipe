@@ -1,6 +1,6 @@
 //! An implementation of a hand to store cards
 
-
+use std::fmt::{self, Display, Formatter};
 
 use super::card::Card;
 
@@ -40,5 +40,16 @@ impl<'a> IntoIterator for &'a Hand {
         // Need to split out into line to get the slice properly
         let cards = &self.cards;
         cards.iter()
+    }
+}
+
+impl Display for Hand {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let string = self
+            .into_iter()
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<String>>()
+            .join(",");
+        write!(f, "[{string}]")
     }
 }
