@@ -8,7 +8,6 @@ use std::fmt::{self, Display, Formatter};
 /// An enum representing the rank of a card
 #[derive(Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Debug)]
 pub enum Rank {
-    Ace,
     Two,
     Three,
     Four,
@@ -21,6 +20,7 @@ pub enum Rank {
     Jack,
     Queen,
     King,
+    Ace,
 }
 
 impl Rank {
