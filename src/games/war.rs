@@ -39,6 +39,7 @@ impl Default for WarGame {
     fn default() -> WarGame {
         let mut players = vec![Hand::default(), Hand::default()];
         let mut deck = Deck::default();
+        deck.shuffle_with_default_rng();
         deck.deal_all_cards_to_hands(&mut players).unwrap();
         WarGame {
             player_1_hand: players[0].clone(),
@@ -96,8 +97,26 @@ impl Game for WarGame {
         match player_1_play.cmp(&player_2_play) {
             Ordering::Equal => {
                 debug!("{} == {}", player_1_play, player_2_play);
-                self.player_1_capture.add(player_1_play.unwrap());
-                self.player_2_capture.add(player_2_play.unwrap());
+                let mut reward_cards = vec![player_1_play.unwrap(), player_2_play.unwrap()];
+                let mut ordering = Ordering::Equal;
+                while ordering == Ordering::Equal {
+                    for _ in 0..3 {
+                        reward_cards.push(self.player_1_hand.pop().unwrap());
+                        reward_cards.push(self.player_2_hand.pop().unwrap());
+                    }
+                    let player_1_check = self.player_1_hand.pop().unwrap();
+                    let player_2_check = self.player_2_hand.pop().unwrap();
+
+                    reward_cards.push(player_1_check.clone());
+                    reward_cards.push(player_2_check.clone());
+                    ordering = Suitless(player_1_check).cmp(&Suitless(player_2_check));
+                }
+
+                if ordering == Ordering::Less {
+                    self.player_2_capture.extend(reward_cards);
+                } else {
+                    self.player_1_capture.extend(reward_cards);
+                }
             }
             Ordering::Less => {
                 debug!("{} < {}", player_1_play, player_2_play);
