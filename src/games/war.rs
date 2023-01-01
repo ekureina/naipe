@@ -100,16 +100,63 @@ impl Game for WarGame {
                 let mut reward_cards = vec![player_1_play.unwrap(), player_2_play.unwrap()];
                 let mut ordering = Ordering::Equal;
                 while ordering == Ordering::Equal {
+                    debug!("Tiebreaking round");
+                    let mut player_1_check = None;
+                    let mut player_2_check = None;
                     for _ in 0..3 {
-                        reward_cards.push(self.player_1_hand.pop().unwrap());
-                        reward_cards.push(self.player_2_hand.pop().unwrap());
+                        let player_1_down_card = self.player_1_hand.pop().or_else(|| {
+                            self.player_1_capture.shuffle_with_default_rng();
+                            if self.player_1_capture.is_empty() {
+                                None
+                            } else {
+                                self.player_1_hand.extend(
+                                    self.player_1_capture.deal_all_cards(1).unwrap()[0].clone(),
+                                );
+                                self.player_1_hand.pop()
+                            }
+                        });
+                        let player_2_down_card = self.player_2_hand.pop().or_else(|| {
+                            self.player_2_capture.shuffle_with_default_rng();
+                            if self.player_2_capture.is_empty() {
+                                None
+                            } else {
+                                self.player_2_hand.extend(
+                                    self.player_2_capture.deal_all_cards(1).unwrap()[0].clone(),
+                                );
+                                self.player_2_hand.pop()
+                            }
+                        });
+                        if let Some(card) = player_1_down_card {
+                            reward_cards.push(card);
+                            player_1_check = player_1_down_card;
+                        }
+                        if let Some(card) = player_2_down_card {
+                            reward_cards.push(card);
+                            player_2_check = player_2_down_card;
+                        }
                     }
-                    let player_1_check = self.player_1_hand.pop().unwrap();
-                    let player_2_check = self.player_2_hand.pop().unwrap();
+                    let player_1_final = self.player_1_hand.pop();
+                    let player_2_final = self.player_2_hand.pop();
+                    if let Some(card) = player_1_final {
+                        reward_cards.push(card);
+                    }
+                    if let Some(card) = player_2_final {
+                        reward_cards.push(card);
+                    }
 
-                    reward_cards.push(player_1_check.clone());
-                    reward_cards.push(player_2_check.clone());
-                    ordering = Suitless(player_1_check).cmp(&Suitless(player_2_check));
+                    player_1_check = player_1_final.or(player_1_check);
+                    player_2_check = player_2_final.or(player_2_check);
+
+                    debug!("Tiebreakers: {:?} vs {:?}", player_1_check, player_2_check);
+
+                    ordering = match (player_1_check, player_2_check) {
+                        (Some(card_1), Some(card_2)) => Suitless(card_1).cmp(&Suitless(card_2)),
+                        (Some(_), None) => Ordering::Greater,
+                        (None, Some(_)) => Ordering::Less,
+                        (None, None) => {
+                            unreachable!("Unable to tiebreak");
+                        }
+                    }
                 }
 
                 if ordering == Ordering::Less {
