@@ -10,9 +10,16 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+env_logger = "0.10.0"
+log = "0.4.17"
 rand = "0.8.5"
 thiserror = "1.0.38"
 
 [features]
+default = ["all_games"]
 all_games = ["war"]
 war = []
+
+[[bin]]
+name = "war"
+required-features = ["war"]

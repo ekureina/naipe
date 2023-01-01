@@ -24,6 +24,11 @@ impl Hand {
     pub fn is_empty(&self) -> bool {
         self.cards.is_empty()
     }
+
+    /// Finds how many cards are currently in this hand
+    pub fn len(&self) -> usize {
+        self.cards.len()
+    }
 }
 
 impl FromIterator<Card> for Hand {
